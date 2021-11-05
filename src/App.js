@@ -5,7 +5,7 @@ function App() {
 
   const [tareas,setTareas] = React.useState([])
   const [tarea,setTarea] = React.useState('')
-
+  const [modoEdicion,setModoEdicion] = React.useState(false)
 
 
 
@@ -60,7 +60,19 @@ function App() {
       
       
     }
+    const eliminar = async(id)=>{
 
+      try {
+        const db = firebase.firestore()
+        await db.collection('tareas').doc(id).delete()
+
+        const arrayFiltrado = tareas.filter(item=>item.id !== id)
+        setTareas(arrayFiltrado)
+
+      } catch (error) {
+        console.log(error)
+      }
+    }
 
 
 
@@ -76,13 +88,18 @@ function App() {
               tareas.map(item=>(
                 <li className="list-group-item" key={item.id}>
                   {item.name}
+                  <button className="btn btn-danger btn-sm float-end" onClick={()=>eliminar(item.id)}>eliminar</button>
+                  <button className="btn btn-warning btn-sm float-end mx-2">editar</button>
                 </li>
+                
               ))
             }
           </ul>
         </div>
         <div className="col-md-6">
-          <h3>Formulario</h3>
+          <h3>{
+            modoEdicion ? 'editar tarea' : 'agregar tarea'
+          }</h3>
           <form onSubmit={agregar}>
             <input
               type="text"
